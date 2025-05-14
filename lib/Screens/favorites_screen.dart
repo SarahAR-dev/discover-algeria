@@ -1098,10 +1098,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 }*/
 
 import 'package:app_pfe/Screens/place_details_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'place_details_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({Key? key}) : super(key: key);
@@ -1312,7 +1311,11 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
-                          data['imageUrl'] ?? '',
+                          (data['images'] != null &&
+                                  data['images'] is List &&
+                                  (data['images'] as List).isNotEmpty)
+                              ? data['images'][0]
+                              : 'https://via.placeholder.com/150',
                           width: 60,
                           height: 60,
                           fit: BoxFit.cover,
