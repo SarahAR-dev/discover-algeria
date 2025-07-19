@@ -271,7 +271,12 @@ class AuthService {
   }
 }*/
 
-import 'package:firebase_auth/firebase_auth.dart';
+
+
+
+
+
+/*import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
@@ -461,3 +466,311 @@ class AuthService {
     }
   }
 }
+
+
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // Obtenir l'utilisateur actuel
+  User? get currentUser => _auth.currentUser;
+
+  // Vérifier l'état de connexion
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Connexion avec email et mot de passe
+  Future<UserCredential> signInWithEmailAndPassword(
+      String email,
+      String password,
+      ) async {
+
+
+    try {
+      final UserCredential userCredential = await _auth
+          .signInWithEmailAndPassword(email: email.trim(), password: password);
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      print('Erreur de connexion: ${e.code}');
+      switch (e.code) {
+        case 'user-not-found':
+          throw 'Aucun utilisateur trouvé avec cet email';
+        case 'wrong-password':
+          throw 'Mot de passe incorrect';
+        case 'invalid-email':
+          throw 'Format d\'email invalide';
+        case 'user-disabled':
+          throw 'Ce compte a été désactivé';
+        default:
+          throw 'Une erreur s\'est produite lors de la connexion';
+      }
+    }
+  }
+
+  // Inscription avec email et mot de passe
+  Future<UserCredential> registerWithEmailAndPassword(
+      String email,
+      String password,
+      String username,
+      ) async {
+    try {
+      // Vérifier si l'utilisateur actuel est anonyme
+      if (_auth.currentUser?.isAnonymous ?? false) {
+        print('Liaison du compte anonyme avec email/mot de passe');
+        print('UID anonyme avant liaison: ${_auth.currentUser?.uid}');
+
+        // Créer les credentials email/mot de passe
+        final AuthCredential credential = EmailAuthProvider.credential(
+          email: email.trim(),
+          password: password,
+        );
+
+        try {
+          // Tenter de lier le compte anonyme avec email/mot de passe
+          final UserCredential userCredential = await _auth.currentUser!.linkWithCredential(credential);
+
+          // Mettre à jour le nom d'utilisateur
+          await userCredential.user?.updateDisplayName(username);
+
+          print('Liaison réussie!');
+          print('UID après liaison: ${userCredential.user?.uid}');
+          print('Même UID: ${_auth.currentUser?.uid == userCredential.user?.uid}');
+
+          return userCredential;
+        } on FirebaseAuthException catch (e) {
+          // Si l'email est déjà utilisé
+          if (e.code == 'email-already-in-use') {
+            print('Cet email est déjà utilisé par un autre compte');
+
+            // On pourrait proposer une solution de fusion de comptes ici
+            // Pour l'instant, échec de l'inscription
+            throw 'Cet email est déjà utilisé. Veuillez vous connecter directement.';
+          } else {
+            // Autres erreurs Firebase
+            rethrow;
+          }
+        }
+      } else {
+        // Inscription normale si pas d'utilisateur anonyme
+        final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: email.trim(),
+          password: password,
+        );
+
+        // Mettre à jour le nom d'utilisateur
+        await userCredential.user?.updateDisplayName(username);
+
+        return userCredential;
+      }
+    } on FirebaseAuthException catch (e) {
+      print('Erreur d\'inscription: ${e.code}');
+      switch (e.code) {
+        case 'email-already-in-use':
+          throw 'Cet email est déjà utilisé';
+        case 'invalid-email':
+          throw 'Format d\'email invalide';
+        case 'weak-password':
+          throw 'Le mot de passe doit contenir au moins 6 caractères';
+        case 'operation-not-allowed':
+          throw 'L\'inscription par email/mot de passe n\'est pas activée';
+        default:
+          throw 'Une erreur s\'est produite lors de l\'inscription';
+      }
+    }
+  }
+
+
+
+
+
+  // Connexion avec Google
+  Future<UserCredential> signInWithGoogle() async {
+
+    try {
+      // Déclencher le flux de connexion Google
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw 'Connexion Google annulée';
+      }
+
+      // Obtenir les détails d'authentification
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Créer les credentials pour Firebase
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Vérifier si l'utilisateur est anonyme
+      if (_auth.currentUser?.isAnonymous ?? false) {
+        // Au lieu de supprimer l'utilisateur anonyme, lier les credentials
+        print('Liaison du compte anonyme avec Google');
+        print('UID anonyme avant liaison: ${_auth.currentUser?.uid}');
+
+        try {
+          // Tenter de lier le compte anonyme avec Google
+          final UserCredential userCredential = await _auth.currentUser!.linkWithCredential(credential);
+
+          print('Liaison réussie!');
+          print('UID après liaison: ${userCredential.user?.uid}');
+          print('Même UID: ${_auth.currentUser?.uid == userCredential.user?.uid}');
+
+          return userCredential;
+        } on FirebaseAuthException catch (e) {
+          // Si l'email est déjà utilisé, on doit gérer différemment
+          if (e.code == 'credential-already-in-use' || e.code == 'email-already-in-use') {
+            print('Cet email Google est déjà utilisé par un autre compte');
+
+            // On pourrait proposer une solution de fusion de comptes ici
+            // Pour l'instant, supprimer l'anonyme et se connecter normalement
+            await _auth.currentUser?.delete();
+            final UserCredential userCredential = await _auth.signInWithCredential(credential);
+            return userCredential;
+          } else {
+            // Autres erreurs de Firebase
+            rethrow;
+          }
+        }
+      } else {
+        // Si l'utilisateur n'est pas anonyme, connexion normale
+        final UserCredential userCredential = await _auth.signInWithCredential(credential);
+        return userCredential;
+      }
+    } catch (e) {
+      print('Erreur de connexion Google: $e');
+      await _googleSignIn.signOut();
+      rethrow;
+    }
+  }
+
+
+
+  // Méthode de connexion anonyme
+  Future<UserCredential> signInAnonymously() async {
+    try {
+      final userCredential = await _auth.signInAnonymously();
+      print('Connexion anonyme réussie');
+      print('UID: ${userCredential.user?.uid}');
+      return userCredential;
+    } catch (e) {
+      print('Erreur lors de la connexion anonyme: $e');
+      rethrow;
+    }
+  }
+
+  // Déconnexion
+  /*Future<void> signOut() async {
+    try {
+      await _googleSignIn.signOut();
+      await _auth.signOut();
+      print('Déconnexion réussie');
+    } catch (e) {
+      print('Erreur lors de la déconnexion: $e');
+      rethrow;
+    }
+  }*/
+
+  Future<void> signOut() async {
+    try {
+      // 1. Forcer déconnexion Google
+      await _googleSignIn.disconnect();
+      await _googleSignIn.signOut();
+
+      // 2. Forcer déconnexion Firebase
+      await _auth.signOut();
+
+      // 3. Attendre stabilisation
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      // 4. Vérifier déconnexion
+      if (_auth.currentUser != null) {
+        await _auth.signOut();
+      }
+
+      print('Déconnexion réussie');
+    } catch (e) {
+      print('Erreur lors de la déconnexion: $e');
+      // Force brutale
+      await _auth.signOut();
+      rethrow;
+    }
+  }
+
+  // Vérifier le statut de connexion actuel
+  Future<void> checkCurrentUser() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      print('Utilisateur actuel:');
+      print('UID: ${user.uid}');
+      print('Email: ${user.email}');
+      print('Anonyme: ${user.isAnonymous}');
+      print('Providers: ${user.providerData.map((e) => e.providerId).join(', ')}');
+    } else {
+      print('Aucun utilisateur connecté');
+    }
+  }
+
+  // Réinitialisation du mot de passe
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      print('Email de réinitialisation envoyé à: $email');
+    } on FirebaseAuthException catch (e) {
+      print('Erreur lors de la réinitialisation du mot de passe: ${e.code}');
+      if (e.code == 'user-not-found') {
+        throw 'Aucun utilisateur trouvé avec cet email';
+      } else if (e.code == 'invalid-email') {
+        throw 'Email invalide';
+      }
+      throw 'Une erreur est survenue';
+    }
+  }
+}
+

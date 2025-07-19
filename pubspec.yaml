@@ -45,6 +45,19 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   sqflite: ^2.3.2
   path: ^1.8.3
+  geolocator: ^14.0.0
+  flutter_map: ^8.1.1
+  http: ^1.4.0
+  latlong2: ^0.9.1
+  google_maps_flutter: ^2.12.2
+  permission_handler: ^12.0.0+1
+  intl: ^0.20.2
+  google_fonts: ^6.2.1
+  cached_network_image: ^3.2.0
+  flutter_animate: ^4.2.0
+  location: ^8.0.0
+  dio: ^5.3.0
+  connectivity_plus: ^5.0.1
 
 
 dev_dependencies:
@@ -86,6 +99,10 @@ flutter:
     - assets/images/monument_des_martyres_4.jpg
     - assets/images/monument_des_martyres_5.jpg
     - assets/images/header_background.jpg
+    - assets/images/header_background_2.jpg
+    - assets/images/header_background_3.jpg
+    - assets/images/header_background_4.jpg
+    - assets/images/header_background_5.jpg
     - assets/images/casbah_d'alger_1.jpg
     - assets/images/casbah_d'alger_2.jpg
     - assets/images/casbah_d'alger_3.jpg
@@ -121,6 +138,7 @@ flutter:
     - assets/images/header_background_3.jpg
     - assets/images/header_background_4.jpg
     - assets/images/header_background_5.jpg
+    - assets/images/splashcreen.jpg
 
 
 

@@ -716,11 +716,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
  */
 
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_screen.dart';
 import 'favorites_screen.dart';
-import 'explorer_screen.dart'; // Nouvel import
+import 'explorer_screen.dart';
+import 'itineraryScreen.dart';
+import 'search_screenn.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -775,6 +777,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: PageView(
           controller: _pageController,
@@ -788,13 +791,18 @@ class _HomeScreenState extends State<HomeScreen> {
             const ExplorerScreen(),
 
             // Page Rechercher
-            _buildSearchPage(),
+            //_buildSearchPage(),
+              PlaceSearchPage(),
 
             // Page Favoris
             const FavoritesScreen(),
 
+            //  ItineraryScreen(), //
+
+
             // Page Profil (vide)
-            Container(),
+            //Container(),
+            const ProfileScreen(),
           ],
         ),
       ),
@@ -815,6 +823,14 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.favorite_border),
             label: 'Favoris',
           ),
+
+          /*BottomNavigationBarItem(
+            icon: Icon(Icons.route), // ou Icons.history, Icons.map
+            label: 'Itinéraire',
+          ),*/
+
+
+
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             label: 'Profil',
@@ -824,7 +840,150 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSearchPage() {
+  /*Widget _buildSearchPage() {
     return const Center(child: Text('Page Recherche'));
+  }*/
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'profile_screen.dart';
+import 'favorites_screen.dart';
+import 'explorer_screen.dart';
+import 'itineraryScreen.dart';
+import 'search_screenn.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+  final PageController _pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Vérifier l'état de l'authentification
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      print('Utilisateur dans HomeScreen:');
+      print('UID: ${user.uid}');
+      print('Est anonyme: ${user.isAnonymous}');
+    } else {
+      print('Aucun utilisateur connecté dans HomeScreen');
+    }
   }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onItemTapped(int index) {
+    if (index == 3) {
+      // Index pour le profil
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+        _pageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          children: [
+            // Page Explorer
+            const ExplorerScreen(),
+
+            // Page Rechercher
+            //_buildSearchPage(),
+            PlaceSearchPage(),
+
+            // Page Favoris
+            const FavoritesScreen(),
+
+            //  ItineraryScreen(), //
+
+
+            // Page Profil (vide)
+            //Container(),
+            const ProfileScreen(),
+          ],
+        ),
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF0F6134),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explorer'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Rechercher',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_border),
+            label: 'Favoris',
+          ),
+
+          /*BottomNavigationBarItem(
+            icon: Icon(Icons.route), // ou Icons.history, Icons.map
+            label: 'Itinéraire',
+          ),*/
+
+
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profil',
+          ),
+        ],
+      ),
+    );
+  }
+
+/*Widget _buildSearchPage() {
+    return const Center(child: Text('Page Recherche'));
+  }*/
 }

@@ -27,6 +27,7 @@ class _AboutScreenState extends State<AboutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('À propos'),
         backgroundColor: const Color(0xFF0F6134),

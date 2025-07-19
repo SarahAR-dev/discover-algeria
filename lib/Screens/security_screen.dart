@@ -77,6 +77,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Sécurité'),
         backgroundColor: const Color(0xFF0F6134),
@@ -209,7 +210,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             const SizedBox(height: 32),
 
             // Section Authentification à deux facteurs
-            const Text(
+            /*const Text(
               'Authentification à deux facteurs',
               style: TextStyle(
                 fontSize: 18,
@@ -232,10 +233,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 32),*/
 
             // Section Appareils connectés
-            const Text(
+            /*const Text(
               'Appareils connectés',
               style: TextStyle(
                 fontSize: 18,
@@ -251,7 +252,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
               onTap: () {
                 // TODO: Implémenter la gestion des appareils
               },
-            ),
+            ),*/
           ],
         ),
       ),

@@ -22,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Paramètres'),
         backgroundColor: const Color(0xFF0F6134),
@@ -76,7 +77,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               });
             },
           ),
-          SwitchListTile(
+          /*SwitchListTile(
             title: const Text('Localisation'),
             subtitle: const Text('Autoriser l\'accès à la localisation'),
             secondary: const Icon(Icons.location_on, color: Color(0xFF0F6134)),
@@ -86,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _locationEnabled = value;
               });
             },
-          ),
+          ),*/
           SwitchListTile(
             title: const Text('Mode sombre'),
             subtitle: const Text('Changer l\'apparence de l\'application'),
@@ -172,14 +173,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Section Données
-          _buildSectionTitle('Données'),
+          /*_buildSectionTitle('Données'),
           ListTile(
             leading: const Icon(Icons.delete_outline, color: Colors.red),
             title: const Text('Supprimer mon compte'),
             onTap: () {
               _showDeleteAccountDialog();
             },
-          ),
+          ),*/
 
           const SizedBox(height: 32),
 

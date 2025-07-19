@@ -6,6 +6,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Politique de confidentialité'),
         backgroundColor: const Color(0xFF0F6134),
@@ -56,7 +57,6 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _buildSection(
               'Protection des données',
               'Nous protégeons vos données en :\n'
-                  '• Utilisant un cryptage sécurisé\n'
                   '• Limitant l\'accès aux données\n'
                   '• Ne partageant pas vos informations avec des tiers\n'
                   '• Respectant les normes de sécurité',
@@ -71,13 +71,13 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   '• Désactiver la localisation',
             ),
 
-            _buildSection(
+            /*_buildSection(
               'Cookies et stockage',
               'Nous utilisons le stockage local pour :\n'
                   '• Sauvegarder vos préférences\n'
                   '• Améliorer les performances\n'
                   '• Maintenir votre session',
-            ),
+            ),*/
 
             _buildSection(
               'Partage des données',

@@ -21,6 +21,7 @@ class HelpCenterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Centre d\'aide'),
         backgroundColor: const Color(0xFF0F6134),
@@ -157,7 +158,7 @@ class HelpCenterScreen extends StatelessWidget {
             ),
 
             // Téléphone
-            Padding(
+            /*Padding(
               padding: const EdgeInsets.all(16),
               child: Card(
                 child: ListTile(
@@ -183,7 +184,7 @@ class HelpCenterScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
+            ),*/
 
             // Chat en direct (à implémenter plus tard)
             Padding(

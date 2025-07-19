@@ -80,6 +80,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Informations du profil'),
         backgroundColor: const Color(0xFF0F6134),
@@ -164,7 +165,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               const SizedBox(height: 16),
 
               // Email
-              TextFormField(
+              /*TextFormField(
                 controller: _emailController,
                 enabled: _isEditing,
                 decoration: const InputDecoration(
@@ -180,11 +181,11 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                   }
                   return null;
                 },
-              ),
+              ),*/
               const SizedBox(height: 16),
 
               // Téléphone
-              TextFormField(
+              /*TextFormField(
                 controller: _phoneController,
                 enabled: _isEditing,
                 decoration: const InputDecoration(
@@ -199,7 +200,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                   }
                   return null;
                 },
-              ),
+              ),*/
               const SizedBox(height: 32),
 
               if (_isEditing)

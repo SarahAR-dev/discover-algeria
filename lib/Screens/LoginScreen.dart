@@ -1740,7 +1740,28 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }*/
 
-import 'package:firebase_auth/firebase_auth.dart';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////
+
+
+
+/*import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
@@ -2008,14 +2029,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: 'Entrez votre mot de passe',
                       prefixIcon: const Icon(
                         Icons.lock,
-                        color: algeriaDarkGreen,
+                        color:algeriaDarkGreen ,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: algeriaDarkGreen,
+                          color: /*algeriaDarkGreen*/  Colors.grey,
                         ),
                         onPressed: () {
                           setState(() {
@@ -2175,3 +2196,856 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+*/
+
+
+
+
+////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+/*
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
+import 'register_screen.dart';
+import 'home_screen.dart';
+import 'forgot_password_screen.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
+
+  // Fonction de validation d'email
+  bool isValidEmail(String email) {
+    if (email.contains(' ')) return false;
+    if (email.split('@').length != 2) return false;
+
+    final emailRegExp = RegExp(
+      r'^[a-zA-Z0-9][a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$',
+    );
+
+    if (!emailRegExp.hasMatch(email)) return false;
+
+    final domain = email.split('@')[1];
+    if (!domain.contains('.')) return false;
+
+    final topLevelDomain = domain.split('.').last;
+    if (topLevelDomain.length < 2) return false;
+
+    return true;
+  }
+
+  // Fonction de connexion avec email/mot de passe
+  Future<void> _loginUser() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Utiliser le service d'authentification au lieu de FirebaseAuth directement
+        await _authService.signInWithEmailAndPassword(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        );
+
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+          );
+        }
+      } catch (e) {
+        String message;
+        if (e is FirebaseAuthException) {
+          if (e.code == 'user-not-found') {
+            message = 'Aucun utilisateur trouvé avec cet email.';
+          } else if (e.code == 'wrong-password') {
+            message = 'Mot de passe incorrect.';
+          } else if (e.code == 'invalid-email') {
+            message = 'Format d\'email invalide.';
+          } else if (e.code == 'user-disabled') {
+            message = 'Ce compte a été désactivé.';
+          } else {
+            message = 'Erreur de connexion: ${e.message}';
+          }
+        } else {
+          message = 'Erreur: $e';
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message), backgroundColor: Colors.red),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  // Fonction de connexion anonyme
+  Future<void> _signInAnonymously() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Utiliser le service d'authentification au lieu de FirebaseAuth directement
+      final userCredential = await _authService.signInAnonymously();
+      final user = userCredential.user;
+
+      if (user != null && mounted) {
+        print('Connexion anonyme réussie');
+        print('UID Anonyme: ${user.uid}');
+        print('Est anonyme?: ${user.isAnonymous}');
+
+        // Message de succès
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Connecté en tant qu\'invité'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigation vers Home
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+        );
+      }
+    } catch (e) {
+      String errorMessage;
+      if (e is FirebaseAuthException) {
+        print('Erreur d\'authentification anonyme: ${e.message}');
+        switch (e.code) {
+          case 'operation-not-allowed':
+            errorMessage = 'L\'authentification anonyme n\'est pas activée';
+            break;
+          default:
+            errorMessage = 'Une erreur est survenue: ${e.message}';
+        }
+      } else {
+        print('Erreur inattendue: $e');
+        errorMessage = 'Une erreur inattendue est survenue: $e';
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 60),
+                // Logo
+                Icon(
+                  Icons.travel_explore,
+                  size: 100,
+                  color: Theme.of(context).primaryColor,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Tour Explorer',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // Email field
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          hintText: 'Entrez votre email',
+                          prefixIcon: Icon(Icons.email_outlined),
+                          helperText: "Format: exemple@domaine.com",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre email';
+                          }
+                          if (!isValidEmail(value)) {
+                            return 'Email invalide. Vérifiez le format.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // Password field
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Mot de passe',
+                          hintText: 'Entrez votre mot de passe',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre mot de passe';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      // Forgot password button
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text('Mot de passe oublié ?'),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Login button
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _loginUser,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child:
+                        _isLoading
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                            : const Text(
+                          'Se connecter',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Register button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Vous n'avez pas de compte ?"),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RegisterScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text("S'inscrire"),
+                          ),
+                        ],
+                      ),
+                      // Bouton connexion anonyme
+                      TextButton(
+                        onPressed: _isLoading ? null : _signInAnonymously,
+                        child:
+                        _isLoading
+                            ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.grey,
+                            ),
+                          ),
+                        )
+                            : const Text(
+                          'Continuer en tant qu\'invité',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+}*/
+
+
+
+
+
+
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
+import 'register_screen.dart';
+import 'home_screen.dart';
+import 'forgot_password_screen.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
+
+  // Fonction de validation d'email (reste inchangée)
+  /*bool isValidEmail(String email) {
+    // Code existant...
+    return true;
+  }*/
+
+  // Fonction de validation d'email
+  bool isValidEmail(String email) {
+    if (email.contains(' ')) return false;
+    if (email.split('@').length != 2) return false;
+
+    final emailRegExp = RegExp(
+      r'^[a-zA-Z0-9][a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$',
+    );
+
+    if (!emailRegExp.hasMatch(email)) return false;
+
+    final domain = email.split('@')[1];
+    if (!domain.contains('.')) return false;
+
+    final topLevelDomain = domain.split('.').last;
+    if (topLevelDomain.length < 2) return false;
+
+    return true;
+  }
+
+  // Fonction de connexion avec email/mot de passe
+  Future<void> _loginUser() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final email = _emailController.text.trim();
+        final password = _passwordController.text.trim();
+
+        // Vérifier si l'utilisateur est anonyme
+        final currentUser = FirebaseAuth.instance.currentUser;
+        final isAnonymous = currentUser?.isAnonymous ?? false;
+
+        if (isAnonymous) {
+          // L'utilisateur est anonyme, tenter de le lier à un compte email/password
+          try {
+            // Créer les credentials email/password
+            final credential = EmailAuthProvider.credential(
+              email: email,
+              password: password,
+            );
+
+            // Tenter de lier l'utilisateur anonyme
+            await currentUser!.linkWithCredential(credential);
+
+            // Succès!
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Compte créé et lié avec succès!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+              );
+            }
+          } on FirebaseAuthException catch (e) {
+            if (e.code == 'email-already-in-use') {
+              // L'email existe déjà, proposer de se connecter
+              if (mounted) {
+                final wantToLogin = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Compte existant'),
+                    content: const Text(
+                        'Un compte existe déjà avec cet email. Voulez-vous vous connecter et remplacer votre session invité?'
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Annuler'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Se connecter'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (wantToLogin == true) {
+                  // Supprimer l'utilisateur anonyme et se connecter avec le compte existant
+                  await currentUser!.delete();
+                  await _authService.signInWithEmailAndPassword(email, password);
+
+                  if (mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          (route) => false,
+                    );
+                  }
+                }
+              }
+            } else {
+              // Autres erreurs
+              throw e;
+            }
+          }
+        } else {
+          // Utilisateur non anonyme, connexion normale
+          await _authService.signInWithEmailAndPassword(email, password);
+
+          if (mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+            );
+          }
+        }
+      } catch (e) {
+        String message;
+        if (e is FirebaseAuthException) {
+          if (e.code == 'user-not-found') {
+            // Compte inexistant, proposer l'inscription
+            if (mounted) {
+              final wantToRegister = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Compte inexistant'),
+                  content: const Text(
+                      'Ce compte n\'existe pas. Souhaitez-vous créer un nouveau compte?'
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Non'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('S\'inscrire'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (wantToRegister == true) {
+                // Rediriger vers l'inscription avec les informations pré-remplies
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegisterScreen(
+                      initialEmail: _emailController.text.trim(),
+                      initialPassword: _passwordController.text.trim(),
+                    ),
+                  ),
+                );
+              }
+              return; // Sortir de la fonction après la gestion du dialogue
+            }
+            message = 'Aucun utilisateur trouvé avec cet email.';
+          } else if (e.code == 'wrong-password') {
+            message = 'Mot de passe incorrect.';
+          } else if (e.code == 'invalid-email') {
+            message = 'Format d\'email invalide.';
+          } else if (e.code == 'user-disabled') {
+            message = 'Ce compte a été désactivé.';
+          } else {
+            message = 'Erreur de connexion: ${e.message}';
+            print('Code d\'erreur: ${e.code}, Message: ${e.message}');
+          }
+        } else {
+          message = 'Erreur: $e';
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message), backgroundColor: Colors.red),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  // Fonction de connexion avec Google
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _authService.signInWithGoogle();
+
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+        );
+      }
+    } catch (e) {
+      print('Erreur de connexion Google: $e');
+      if (mounted) {
+        String message = 'Erreur lors de la connexion avec Google';
+        if (e is FirebaseAuthException) {
+          if (e.code == 'account-exists-with-different-credential') {
+            message = 'Ce compte existe déjà avec une autre méthode de connexion';
+          } else {
+            message = 'Erreur de connexion Google: ${e.message}';
+          }
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Fonction de connexion anonyme (reste inchangée)
+  Future<void> _signInAnonymously() async {
+    // Code existant...
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 60),
+                // Logo
+                Icon(
+                  Icons.travel_explore,
+                  size: 100,
+                  color: Theme.of(context).primaryColor,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Tour Explorer',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // Email field
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          hintText: 'Entrez votre email',
+                          prefixIcon: Icon(Icons.email_outlined),
+                          helperText: "Format: exemple@domaine.com",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre email';
+                          }
+                          if (!isValidEmail(value)) {
+                            return 'Email invalide. Vérifiez le format.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // Password field
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Mot de passe',
+                          hintText: 'Entrez votre mot de passe',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre mot de passe';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      // Forgot password button
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text('Mot de passe oublié ?'),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Login button
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _loginUser,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child:
+                        _isLoading
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                            : const Text(
+                          'Se connecter',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Bouton Google
+                      /*OutlinedButton.icon(
+                        onPressed: _isLoading ? null : _signInWithGoogle,
+                        icon: Image.asset(
+                          'assets/images/google_logo.png',
+                          height: 24,
+                          // Si vous n'avez pas ce logo, remplacez par:
+                          // const Icon(Icons.g_mobiledata, size: 24),
+                        ),
+                        label: const Text('Se connecter avec Google'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(color: Colors.grey[300]!),
+                        ),
+                      ),*/
+
+
+                      OutlinedButton.icon(
+                        onPressed: _isLoading ? null : _signInWithGoogle,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: /*Colors.grey.shade300*/ Colors.transparent),
+                          shape: RoundedRectangleBorder(
+                            //borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: Image.asset(
+                          'assets/images/google_logo.png',
+                          height: 24,
+                        ),
+                        label: const Text(
+                          'Continuer avec Google',
+                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      //const SizedBox(height: 16),
+                      // Register button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Vous n'avez pas de compte ?"),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RegisterScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text("S'inscrire"),
+                          ),
+                        ],
+                      ),
+                      // Bouton connexion anonyme
+                      TextButton(
+                        onPressed: _isLoading ? null : _signInAnonymously,
+                        child:
+                        _isLoading
+                            ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.grey,
+                            ),
+                          ),
+                        )
+                            : const Text(
+                          'Continuer en tant qu\'invité',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+}
+
+
+
