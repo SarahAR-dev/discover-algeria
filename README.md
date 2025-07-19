@@ -31,6 +31,14 @@ flutter run
 
 
 
+## 📸 Aperçu de l'application
+<img src="screenshots/home.jpg" width="200">
+<img src="screenshots/details.jpg" width="200">
+<img src="screenshots/welcome.jpg" width="200">
+<img src="screenshots/homee.jpg" width="200">
+
+
+
 📸 Aperçu de l'application
 <img src="https://github.com/user-attachments/assets/c0634cb8-7e4b-451d-b88a-b90cf6e37240" width="200">
 <img src="https://github.com/user-attachments/assets/078129e5-a5e2-473d-853c-72823700fd43" width="200">
