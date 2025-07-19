@@ -10,7 +10,7 @@ Une application mobile interactive pour la **découverte et la promotion des sit
 - 🌐 Mode en ligne et hors ligne
 - ⭐ Système de notation et commentaires
 - ❤️ Gestion des favoris
-- 👤 Profil utilisateur et historique
+- 👤 Profil utilisateur et l'authentification
 
 ---
 
