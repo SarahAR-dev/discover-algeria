@@ -30,9 +30,4 @@ flutter pub get
 flutter run
 
 
-## 📸 Aperçu de l'application
 
-<img src="https://github.com/user-attachments/assets/7ba67728-efe5-4f40-aa8d-9802c0937671" width="250">
-<img src="https://github.com/user-attachments/assets/66b6cec5-4e6b-4822-9638-baa3d908c3dc" width="250">
-<img src="https://github.com/user-attachments/assets/cf0706f6-10aa-46b2-9d79-dc78a395589a" width="250">
-<img src="https://github.com/user-attachments/assets/a974686e-e370-4b2c-91da-f76631787eb6" width="250">
