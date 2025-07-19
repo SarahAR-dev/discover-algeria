@@ -32,10 +32,11 @@ flutter run
 
 
 ## 📸 Aperçu de l'application
-<img src="screenshots/home.jpg" width="200">
-<img src="screenshots/details.jpg" width="200">
-<img src="screenshots/welcome.jpg" width="200">
+
 <img src="screenshots/homee.jpg" width="200">
+<img src="screenshots/detail.jpg" width="200">
+<img src="screenshots/home.png" width="200">
+<img src="screenshots/welcom.jpg" width="200">
 
 
 
