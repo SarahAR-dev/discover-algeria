@@ -1,16 +1,30 @@
-# app_pfe
+# Discover Algeria 🇩🇿
 
-A new Flutter project.
+Une application mobile interactive pour la **découverte et la promotion des sites touristiques en Algérie**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📱 Fonctionnalités principales
+- 🔍 Recherche de lieux touristiques
+- 🗺️ Itinéraires et suggestions de lieux proches
+- 🌐 Mode en ligne et hors ligne
+- ⭐ Système de notation et commentaires
+- ❤️ Gestion des favoris
+- 👤 Profil utilisateur et historique
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🛠️ Technologies utilisées
+- Flutter
+- Firebase (Auth, Firestore, Storage)
+- SQLite (mode offline)
+- Google Maps API
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🚀 Lancer le projet
+```bash
+git clone https://github.com/SarahAR-dev/discover-algeria.git
+cd discover-algeria
+flutter pub get
+flutter run
